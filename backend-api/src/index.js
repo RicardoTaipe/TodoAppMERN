@@ -3,6 +3,7 @@ const path = require("path");
 const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const createError = require("http-errors");
+const cors = require("cors");
 const mountRoutes = require("./routes/index.routes");
 //Initializations
 const app = express();
@@ -13,6 +14,7 @@ require("./database");
 app.set("port", 3000 || process.env.PORT);
 
 //Middlewares
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
