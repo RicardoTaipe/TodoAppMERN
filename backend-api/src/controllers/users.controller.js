@@ -1,46 +1,45 @@
 const User = require("../models/user");
-const passport = require("passport");
+const jwt = require("jsonwebtoken");
+const createError = require("http-errors");
 
 const userController = {};
 
-userController.signUp = async (req, res) => {
-  const { name, email, password, confirm_password } = req.body;
-  const errors = [];
-  if (name.length <= 0) {
-    errors.push({ msg: "Please enter a name" });
+userController.signUp = async (req, res, next) => {
+  const { name, email, password } = req.body;
+  const emailUser = await User.findOne({ email: email });
+  if (emailUser) {
+    return next(createError(401, "The email is already in use"));
   }
-  if (password !== confirm_password) {
-    errors.push({ msg: "Password do not match" });
-  }
-  if (password.length < 4) {
-    errors.push({ msg: "Password must be at least 4 characters" });
-  }
-  if (errors.length > 0) {
-    res.render("users/signup", {
-      errors,
-      name,
-      email,
-      password,
-      confirm_password,
-    });
-  } else {
-    const emailUser = await User.findOne({ email: email });
-    if (emailUser) {
-      req.flash("error_msg", "The email is already in use");
-      res.redirect("/users/signup");
-    }
-    const newUser = new User({ name, email, password });
-    newUser.password = await newUser.encryptPassword(password);
-    await newUser.save();
-    req.flash("success_msg", "Your are signed up");
-    res.redirect("/users/signin");
-  }
+  const newUser = new User({ email, password });
+  newUser.password = await newUser.encryptPassword(password);
+  await newUser.save();
+  res.json("Your are signed up");
 };
 
-userController.login = passport.authenticate("local", {
-  successRedirect: "/notes",
-  failureRedirect: "/users/signin",
-  failureFlash: true,
-});
+userController.login = async (req, res, next) => {
+  const { name, email, password } = req.body;
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    return next(createError(401, "No user found"));
+  }
+  const match = await user.matchPassword(password);
+  if (!match) {
+    return next(createError(403, "Login failed"));
+  }
+  const token = jwt.sign(
+    {
+      userId: user._id,
+    },
+    process.env.JWT_KEY
+  );
+  res.status(200).json({
+    message: "Authentication succesful",
+    token: token,
+    uid: user._id,
+  });
+};
 
+userController.uploadProfilePhoto = async (req, res, next)=>{
+
+};
 module.exports = userController;
