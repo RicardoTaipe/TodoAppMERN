@@ -2,34 +2,36 @@ const Todo = require("../models/todo");
 
 const todosController = {};
 
+todosController.getAllTodos = async (req, res, next) => {
+  const todos = await Todo.find({});
+  res.status(200).json(todos);
+};
+
+todosController.getTodo = async (req, res, next) => {
+  const todoId = req.params.id;
+  const todo = User.findOne(todoId);
+  res.status(200).json(todo);
+};
+
 todosController.createTodo = async (req, res, next) => {
-  try {
-    const { title, description } = req.body;
-    console.log(req.body);
-    const newTodo = new Todo({ title, description });
-    await newTodo.save();
-    res.status(200).json(newTodo);
-  } catch (err) {
-    res.status(400).json({
-      error: err,
-    });
-  }
-};
-/*
-notesController.updateNote = async (req, res) => {
   const { title, description } = req.body;
-  await Note.findByIdAndUpdate(req.params.id, { title, description });
-  req.flash("success_msg", "Note updated successfully");
-  res.redirect("/notes");
+  if (title.trim() === "") throw new Error("Title must not be empty");
+  if (description.trim() === "")
+    throw new Error("Description must not be empty");
+  const newTodo = new Todo({ title, description });
+  const result = await newTodo.save();
+  res.status(200).json(result);
 };
-*/
+
+todosController.updateTodo = async (req, res) => {
+  const { title, description } = req.body;
+  await Todo.findOneAndUpdate(req.params.id, { title, description });
+  res.status(200).json("Updated successfully");
+};
+
 todosController.deleteTodo = async (req, res, next) => {
-  try {
-    await Todo.findOneAndDelete(req.params.id);
-    res.json({ message: "Todo Deleted" });
-  } catch (error) {
-    console.log(error);
-  }
+  await Todo.findOneAndDelete({ _id: req.params.id });
+  res.json({ message: "Deleted succesfully" });
 };
 
 module.exports = todosController;

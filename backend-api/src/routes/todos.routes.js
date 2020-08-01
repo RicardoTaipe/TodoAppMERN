@@ -1,9 +1,8 @@
-const { Router } = require("express");
-const router = Router();
+const router = require("express-promise-router")();
 const {
-  //getAllTodos,
+  getAllTodos,
   createTodo,
-  //updateTodo,
+  updateTodo,
   deleteTodo,
 } = require("../controllers/todos.controller");
 
@@ -11,14 +10,14 @@ const {
 //const { isAuthenticated } = require("../middlewares/auth");
 
 //show all todos
-//router.get("/", isAuthenticated, getAllTodos);
+router.get("/", getAllTodos);
 
 //create a new todo
 router.post("/", createTodo);
 //router.post("/", isAuthenticated, createTodo);
 
 //update a todo in db
-//router.put("/:id", isAuthenticated, updateTodo);
+router.put("/:id", updateTodo);
 
 //delete a todo in db
 router.delete("/:id", deleteTodo);

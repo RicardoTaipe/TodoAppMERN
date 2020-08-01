@@ -3,7 +3,7 @@ const path = require("path");
 const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const createError = require("http-errors");
-
+const mountRoutes = require("./routes/index.routes");
 //Initializations
 const app = express();
 //mongodb connection
@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //Routes
 //app.use("/users", require("./routes/users.routes"));
-app.use("/todos", require("./routes/todos.routes"));
+mountRoutes(app);
 
 app.use((req, res, next) => {
   next(createError(404));
