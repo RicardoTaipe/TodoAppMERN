@@ -12,13 +12,12 @@ const isAuthenticated = require("../middlewares/auth");
 router.get("/", isAuthenticated, getAllTodos);
 
 //create a new todo
-router.post("/", createTodo);
-//router.post("/", isAuthenticated, createTodo);
+router.post("/", isAuthenticated, createTodo);
 
 //update a todo in db
-router.put("/:id", updateTodo);
+router.put("/:id", isAuthenticated, updateTodo);
 
 //delete a todo in db
-router.delete("/:id", deleteTodo);
+router.delete("/:id", isAuthenticated, deleteTodo);
 
 module.exports = router;

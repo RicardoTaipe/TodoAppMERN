@@ -2,7 +2,8 @@ const Todo = require("../models/todo");
 const todosController = {};
 
 todosController.getAllTodos = async (req, res, next) => {
-  const todos = await Todo.find({}).sort({ createdAt: "desc" });
+  const { userId } = req.userData;
+  const todos = await Todo.find({ user: userId }).sort({ createdAt: "desc" });
   res.status(200).json(todos);
 };
 
@@ -17,7 +18,7 @@ todosController.createTodo = async (req, res, next) => {
   if (title.trim() === "") throw new Error("Title must not be empty");
   if (description.trim() === "")
     throw new Error("Description must not be empty");
-  const newTodo = new Todo({ title, description });
+  const newTodo = new Todo({ title, description, user: req.userData.userId });
   const result = await newTodo.save();
   res.status(200).json(result);
 };
