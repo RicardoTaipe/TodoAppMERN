@@ -7,10 +7,9 @@ const {
 } = require("../controllers/todos.controller");
 
 //middleware
-//const { isAuthenticated } = require("../middlewares/auth");
-
+const isAuthenticated = require("../middlewares/auth");
 //show all todos
-router.get("/", getAllTodos);
+router.get("/", isAuthenticated, getAllTodos);
 
 //create a new todo
 router.post("/", createTodo);

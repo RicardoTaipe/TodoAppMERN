@@ -3,6 +3,7 @@ const path = require("path");
 const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const createError = require("http-errors");
+const multer = require("multer");
 const cors = require("cors");
 const mountRoutes = require("./routes/index.routes");
 //Initializations
@@ -18,12 +19,35 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+//setting multer
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, "public/uploads"),
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime() + path.extname(file.originalname));
+  },
+});
+app.use(
+  multer({
+    storage,
+    //destination: path.join(__dirname, "public/uploads"),
+    fileFilter: (req, file, cb) => {
+      const fileTypes = /jpeg|jpg|png|gif/;
+      const mimeType = fileTypes.test(file.mimetype);
+      const extname = fileTypes.test(path.extname(file.originalname));
+      if (mimeType && extname) {
+        return cb(null, true);
+      }
+      cb(new Error("Error: el archivo debe ser una imagen de tipo jpg o png"));
+    },
+  }).single("image")
+);
 
 //Static files
 app.use(express.static(path.join(__dirname, "public")));
 
 //Routes
-//app.use("/users", require("./routes/users.routes"));
+// app.use("/todos", require("./routes/todos.routes"));
+// app.use("/users", require("./routes/users.routes"));
 mountRoutes(app);
 
 app.use((req, res, next) => {

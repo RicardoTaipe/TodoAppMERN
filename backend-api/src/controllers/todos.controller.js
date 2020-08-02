@@ -1,15 +1,14 @@
 const Todo = require("../models/todo");
-
 const todosController = {};
 
 todosController.getAllTodos = async (req, res, next) => {
-  const todos = await Todo.find({});
+  const todos = await Todo.find({}).sort({ createdAt: "desc" });
   res.status(200).json(todos);
 };
 
 todosController.getTodo = async (req, res, next) => {
   const todoId = req.params.id;
-  const todo = User.findOne(todoId);
+  const todo = await User.findOne(todoId);
   res.status(200).json(todo);
 };
 
