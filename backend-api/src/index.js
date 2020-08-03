@@ -12,7 +12,7 @@ const app = express();
 require("./database");
 
 //Settings
-app.set("port", 3000 || process.env.PORT);
+app.set("port", 3001 || process.env.PORT);
 
 //Middlewares
 app.use(cors());
