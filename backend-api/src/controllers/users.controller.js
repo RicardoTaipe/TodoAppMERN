@@ -19,7 +19,16 @@ userController.signUp = async (req, res, next) => {
   const newUser = new User({ email, password, name, username });
   newUser.password = await newUser.encryptPassword(password);
   await newUser.save();
-  res.json("Your are signed up");
+  const token = jwt.sign(
+    {
+      userId: newUser._id,
+    },
+    process.env.JWT_KEY
+  );
+  res.status(200).json({
+    message: "Welcome",
+    token,
+  });
 };
 
 userController.login = async (req, res, next) => {

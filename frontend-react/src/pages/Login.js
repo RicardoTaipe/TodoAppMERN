@@ -11,6 +11,8 @@ import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
+//utils
+import { validEmailRegex } from "../utils/validators";
 
 //another libraries
 import axios from "axios";
@@ -41,10 +43,6 @@ const styles = (theme) => ({
     position: "absolute",
   },
 });
-
-const validEmailRegex = new RegExp(
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-);
 
 class Login extends Component {
   state = {
@@ -111,7 +109,6 @@ class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     if (this.validateForm()) {
-      console.info("Valid Form");
       this.setState({ loading: true });
       const userData = {
         email: this.state.form.email,
@@ -127,7 +124,6 @@ class Login extends Component {
           this.props.history.push("/");
         })
         .catch((error) => {
-          console.error(error.response.data);
           this.setState({
             message: error.response.data.message,
             loading: false,
