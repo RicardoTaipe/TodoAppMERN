@@ -3,14 +3,14 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs-extra");
 const createError = require("http-errors");
 const cloudinary = require("cloudinary").v2;
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const userController = {};
 
-userController.signUp = async (req, res, next) => {
+const signUp = async (req, res, next) => {
   const { email, password, name, username } = req.body;
   const emailUser = await User.findOne({ email: email });
   if (emailUser) {
@@ -31,7 +31,7 @@ userController.signUp = async (req, res, next) => {
   });
 };
 
-userController.login = async (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (!user) {
@@ -54,7 +54,7 @@ userController.login = async (req, res, next) => {
   });
 };
 
-userController.uploadProfilePhoto = async (req, res, next) => {
+const uploadProfilePhoto = async (req, res, next) => {
   console.log(req.file);
   const result = await cloudinary.uploader.upload(req.file.path);
   await User.updateOne(
@@ -65,16 +65,17 @@ userController.uploadProfilePhoto = async (req, res, next) => {
   res.status(200).json("Image uploaded succesfully");
 };
 
-userController.getUserDetail = async (req, res, next) => {
+const getUserDetail = async (req, res, next) => {
   const result = await User.findOne({ _id: req.userData.userId });
   res.status(200).json(result);
 };
 
-userController.updateUserDetails = async (req, res, next) => {
+const updateUserDetails = async (req, res, next) => {
   const result = await User.findOneAndUpdate(
     { _id: req.userData.userId },
     req.body
   );
   res.status(200).json({ message: "Updated successfully" });
 };
-module.exports = userController;
+
+module.exports = { signUp, login, uploadProfilePhoto, getUserDetail, updateUserDetails };

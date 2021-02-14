@@ -19,6 +19,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 //setting multer
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "public/uploads"),

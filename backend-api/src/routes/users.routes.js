@@ -18,4 +18,5 @@ router.post("/image", isAuthenticated, uploadProfilePhoto);
 router.get("/", isAuthenticated, getUserDetail);
 
 router.post("/",isAuthenticated,updateUserDetails);
+
 module.exports = router;
