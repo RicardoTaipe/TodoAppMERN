@@ -11,38 +11,14 @@ import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
+
 //utils
-import { validEmailRegex } from "../utils/validators";
+import { validEmailRegex } from "../../utils/validators";
 
 //another libraries
 import axios from "axios";
-const styles = (theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: "100%",
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  customError: {
-    color: "red",
-    fontSize: "0.8rem",
-    marginTop: 10,
-  },
-  progress: {
-    position: "absolute",
-  },
-});
+
+import {styles} from "./styles";
 
 class Login extends Component {
   state = {
@@ -56,16 +32,6 @@ class Login extends Component {
     },
     message: "",
     loading: false,
-  };
-
-  validateForm = () => {
-    let valid = true;
-    Object.entries(this.state.form).forEach(([key, value]) => {
-      this.validateFields(key, value);
-    });
-    //test there no errors -> convert objet to array and evalute
-    valid = Object.values(this.state.errors).every((error) => error === "");
-    return valid;
   };
 
   validateFields = (name, value) => {
@@ -92,21 +58,27 @@ class Login extends Component {
     }
     this.setState({ errors });
   };
+
   //handle inputs events
   handleChange = (event) => {
     const { name, value } = event.target;
     this.validateFields(name, value);
-    //alternative mode
-    //const newState = { ...this.state };
-    //newState.form[name] = value;
-    //newState.errors = errors;
-    //this.setState(newState);
     this.setState({
       form: { ...this.state.form, [name]: value },
     });
   };
 
-  handleSubmit = (event) => {
+  validateForm = () => {
+    let valid = true;
+    Object.entries(this.state.form).forEach(([key, value]) => {
+      this.validateFields(key, value);
+    });
+    //test there no errors -> convert objet to array and evalute
+    valid = Object.values(this.state.errors).every((error) => error === "");
+    return valid;
+  };
+
+  handleSubmit = async (event) => {
     event.preventDefault();
     if (this.validateForm()) {
       this.setState({ loading: true });
@@ -114,23 +86,25 @@ class Login extends Component {
         email: this.state.form.email,
         password: this.state.form.password,
       };
-      axios
-        .post(`${process.env.REACT_APP_API_BASE_URL}/users/login`, userData)
-        .then((response) => {
-          localStorage.setItem("AuthToken", `Bearer ${response.data.token}`);
-          this.setState({
-            loading: false,
-          });
-          this.props.history.push("/");
-        })
-        .catch((error) => {
-          this.setState({
-            message: error.response.data.message,
-            loading: false,
-          });
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_BASE_URL}/users/login`,
+          userData
+        );
+        localStorage.setItem("AuthToken", `Bearer ${response.data.token}`);
+        this.setState({
+          loading: false,
         });
+        this.props.history.push("/");
+      } catch (error) {
+        this.setState({
+          message: error.response.data.message,
+          loading: false,
+        });
+      }
     }
   };
+
   render() {
     const { classes } = this.props;
     const { errors, loading, message } = this.state;

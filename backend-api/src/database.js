@@ -10,7 +10,7 @@ const connectionSpec = {
 };
 
 mongoose
-  .connect(MONGO_URI, connectionSpec)
+  .connect(MONGO_URI)
   .then((db) => {
     console.log("DB is connected to MONGO ATLAS");
   })
